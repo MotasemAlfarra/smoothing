@@ -12,7 +12,7 @@ from resnet import ResNet18
 
 parser = argparse.ArgumentParser(description='Certify many examples')
 parser.add_argument("--dataset", choices=DATASETS, help="which dataset")
-parser.add_argument("--base_classifier", type=str, help="path to saved pytorch model of base classifier")
+parser.add_argument("--base-classifier", type=str, help="path to saved pytorch model of base classifier")
 parser.add_argument("--sigma", type=float, help="noise hyperparameter")
 parser.add_argument("--outfile", type=str, help="output file")
 parser.add_argument("--batch", type=int, default=1000, help="batch size")
