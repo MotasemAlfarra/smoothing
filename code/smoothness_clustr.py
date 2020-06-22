@@ -10,6 +10,7 @@ import datetime
 from architectures import get_architecture
 from resnet import ResNet18
 import torch.nn as nn
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser(description='Certify many examples')
 parser.add_argument("--dataset", choices=DATASETS, help="which dataset")
@@ -146,7 +147,7 @@ if __name__ == "__main__":
 
     # iterate through the dataset
     dataset = get_dataset(args.dataset, args.split)
-    for i in range(len(dataset)):
+    for i in tqdm(range(len(dataset))):
 
         # only certify every args.skip examples, and stop after args.max examples
         if i % args.skip != 0:
