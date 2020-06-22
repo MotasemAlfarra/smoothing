@@ -26,52 +26,6 @@ args = parser.parse_args()
 
 
 
-if __name__ == "__main__":
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-    # load the base classifier
-    # checkpoint = torch.load(args.base_classifier)
-    # base_classifier = get_architecture(checkpoint["arch"], args.dataset)
-    # base_classifier.load_state_dict(checkpoint['state_dict'])
-
-    #Load our model and make the wrapper
-    model = ResNet18(num_classes=10).to(device)
-    base_classifier = load_model(model, checkpoint=args.base_classifier, L=10, 
-        normalize_probs=False)
-    # create the smooothed classifier g
-    smoothed_classifier = Smooth(base_classifier, get_num_classes(args.dataset), args.sigma)
-
-    # prepare output file
-    f = open(args.outfile, 'w')
-    print("idx\tlabel\tpredict\tradius\tcorrect\ttime", file=f, flush=True)
-
-    # iterate through the dataset
-    dataset = get_dataset(args.dataset, args.split)
-    for i in range(len(dataset)):
-
-        # only certify every args.skip examples, and stop after args.max examples
-        if i % args.skip != 0:
-            continue
-        if i == args.max:
-            break
-
-        (x, label) = dataset[i]
-
-        before_time = time()
-        # certify the prediction of g around x
-        x = x.cuda()
-        prediction, radius = smoothed_classifier.certify(x, args.N0, args.N, args.alpha, args.batch)
-        after_time = time()
-        correct = int(prediction == label)
-
-        time_elapsed = str(datetime.timedelta(seconds=(after_time - before_time)))
-        print("{}\t{}\t{}\t{:.3}\t{}\t{}".format(
-            i, label, prediction, radius, correct, time_elapsed), file=f, flush=True)
-
-    f.close()
-
-
-
 
 def load_model(model, checkpoint, L=None, normalize_probs=None):
     # Load the checkpoint
@@ -130,3 +84,53 @@ class MagnetModelWrapper(nn.Module):
             scores = get_softmax_probs(embeddings, self.magnet_data, 
                 return_scores=True)
         return scores
+
+
+
+
+if __name__ == "__main__":
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+    # load the base classifier
+    # checkpoint = torch.load(args.base_classifier)
+    # base_classifier = get_architecture(checkpoint["arch"], args.dataset)
+    # base_classifier.load_state_dict(checkpoint['state_dict'])
+
+    #Load our model and make the wrapper
+    model = ResNet18(num_classes=10).to(device)
+    base_classifier = load_model(model, checkpoint=args.base_classifier, L=10, 
+        normalize_probs=False)
+    # create the smooothed classifier g
+    smoothed_classifier = Smooth(base_classifier, get_num_classes(args.dataset), args.sigma)
+
+    # prepare output file
+    f = open(args.outfile, 'w')
+    print("idx\tlabel\tpredict\tradius\tcorrect\ttime", file=f, flush=True)
+
+    # iterate through the dataset
+    dataset = get_dataset(args.dataset, args.split)
+    for i in range(len(dataset)):
+
+        # only certify every args.skip examples, and stop after args.max examples
+        if i % args.skip != 0:
+            continue
+        if i == args.max:
+            break
+
+        (x, label) = dataset[i]
+
+        before_time = time()
+        # certify the prediction of g around x
+        x = x.cuda()
+        prediction, radius = smoothed_classifier.certify(x, args.N0, args.N, args.alpha, args.batch)
+        after_time = time()
+        correct = int(prediction == label)
+
+        time_elapsed = str(datetime.timedelta(seconds=(after_time - before_time)))
+        print("{}\t{}\t{}\t{:.3}\t{}\t{}".format(
+            i, label, prediction, radius, correct, time_elapsed), file=f, flush=True)
+
+    f.close()
+
+
+
