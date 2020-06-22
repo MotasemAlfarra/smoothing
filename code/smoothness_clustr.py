@@ -87,6 +87,42 @@ class MagnetModelWrapper(nn.Module):
         return scores
 
 
+def get_softmax_probs(embeddings, magnet_data, return_scores=False):
+
+    device = embeddings.device
+    num_clusters = magnet_data['cluster_classes'].size(0)
+    num_classes = num_clusters // magnet_data['K']
+    batch_size = embeddings.size(0)
+    # distances states, for each instance, the distance to each cluster
+    # Compute squared distances
+    sq_distances = torch.cdist(
+        embeddings, magnet_data['cluster_centers'], p=2)**2
+    # Scale distances with variances
+    sq_distances = sq_distances / magnet_data['variance'].unsqueeze(0)
+    # Compute probs
+    scores = torch.exp(-0.5 * sq_distances)
+    largest_scores, indices = torch.topk(scores, k=magnet_data['L'], 
+        largest=True, sorted=False)
+    # Reshape to sum across clusters of the same class
+    # this is of size [batch_size, num_classes, num_clusters]
+    scores = scores.view(batch_size, num_classes, magnet_data['K'])
+    # Perform sum (in the cluster dimension)
+    scores = scores.sum(dim=2)
+    # Normalizing factors
+    # Get top-L CLOSEST (highest probabilities) clusters (need not be sorted)
+    if magnet_data['normalize_probs']:
+        labs_clusters = magnet_data['cluster_classes'].unsqueeze(0)
+        labs_clusters = labs_clusters.expand(batch_size, num_clusters)
+        labs_clusters = torch.take(labs_clusters, indices)
+        scores = torch.zeros(batch_size, num_classes, device=device)
+        unique_labels = torch.unique(labs_clusters)
+        for label in unique_labels:
+            label_mask = labs_clusters == label
+            scores[:, label] = (largest_scores * label_mask).sum(dim=1)
+
+    # Normalize probabilities in the class dimension (rows)
+    to_return = scores if return_scores else F.normalize(scores, p=1, dim=1)
+    return to_return
 
 
 if __name__ == "__main__":
