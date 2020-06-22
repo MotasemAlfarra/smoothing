@@ -9,6 +9,7 @@ import torch
 import datetime
 from architectures import get_architecture
 from resnet import ResNet18
+import torch.nn as nn
 
 parser = argparse.ArgumentParser(description='Certify many examples')
 parser.add_argument("--dataset", choices=DATASETS, help="which dataset")
