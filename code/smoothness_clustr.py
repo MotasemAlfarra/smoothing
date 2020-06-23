@@ -18,12 +18,12 @@ parser.add_argument("--base-classifier", type=str, help="path to saved pytorch m
 parser.add_argument("--sigma", type=float, help="noise hyperparameter")
 parser.add_argument("--outfile", type=str, help="output file")
 parser.add_argument("--batch", type=int, default=1000, help="batch size")
-parser.add_argument("--skip", type=int, default=1, help="how many examples to skip")
+parser.add_argument("--skip", type=int, default=0, help="how many examples to skip")
 parser.add_argument("--max", type=int, default=-1, help="stop after this many examples")
 parser.add_argument("--split", choices=["train", "test"], default="test", help="train or test set")
 parser.add_argument("--N0", type=int, default=100)
 parser.add_argument("--N", type=int, default=100000, help="number of samples to use")
-parser.add_argument("--alpha", type=float, default=0.99, help="failure probability")
+parser.add_argument("--alpha", type=float, default=0.001, help="failure probability")
 args = parser.parse_args()
 
 
