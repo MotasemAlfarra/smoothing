@@ -19,9 +19,9 @@ class Smooth(object):
         """
         self.base_classifier = base_classifier
         self.num_classes = num_classes
-        self.sigma = 0.0# We do not want to smooth our classifier
+        self.sigma = sigma
 
-    def certify(self, x: torch.tensor, n0: int, n: int, alpha: float, batch_size: int, sig: float) -> (int, float):
+    def certify(self, x: torch.tensor, n0: int, n: int, alpha: float, batch_size: int) -> (int, float):
         """ Monte Carlo algorithm for certifying that g's prediction around x is constant within some L2 radius.
         With probability at least 1 - alpha, the class returned by this method will equal g(x), and g's prediction will
         robust within a L2 ball of radius R around x.
@@ -35,13 +35,11 @@ class Smooth(object):
                  in the case of abstention, the class will be ABSTAIN and the radius 0.
         """
         self.base_classifier.eval()
-        self.sigma = 0.0# We do not want to smooth our classifier
         # draw samples of f(x+ epsilon)
         counts_selection = self._sample_noise(x, n0, batch_size)
         # use these samples to take a guess at the top class
         cAHat = counts_selection.argmax().item()
         # draw more samples of f(x + epsilon)
-        self.sigma = sig
         counts_estimation = self._sample_noise(x, n, batch_size)
         # use these samples to estimate a lower bound on pA
         nA = counts_estimation[cAHat].item()
