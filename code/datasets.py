@@ -49,11 +49,10 @@ def _cifar10(split: str) -> Dataset:
         return datasets.CIFAR10("./dataset_cache", train=True, download=True, transform=transforms.Compose([
             transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(), transforms.Normalize(_CIFAR10_MEAN, _CIFAR10_STDDEV)
+            transforms.ToTensor()
         ]))
     elif split == "test":
-        return datasets.CIFAR10("./dataset_cache", train=False, download=True, transform=transforms.Compose([transforms.ToTensor(),
-         transforms.Normalize(_CIFAR10_MEAN, _CIFAR10_STDDEV)]) )
+        return datasets.CIFAR10("./dataset_cache", train=False, download=True, transform=transforms.ToTensor() )
 
 
 def _imagenet(split: str) -> Dataset:

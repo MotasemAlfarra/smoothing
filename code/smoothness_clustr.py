@@ -73,16 +73,11 @@ class MagnetModelWrapper(nn.Module):
         super(MagnetModelWrapper, self).__init__()
         self.model = model
         self.magnet_data = magnet_data
-        self.mean = mean
-        self.std = std
+        self.mean = torch.tensor([0.4914, 0.4822, 0.4465]).view(1,3,1,1)
+        self.std = torch.tensor( [0.2023, 0.1994, 0.2010]).view(1,3,1,1)
 
     def forward(self, x):
-        if self.magnet_data is None:
-            # If TRADES model -> renormalize data
-            x = x * self.std + self.mean if self.mean is not None else x
-            scores, _ = self.model(x)
-        else:
-            _, embeddings = self.model(x)
+            _, embeddings = self.model((x-self.mean)/self.std)
             scores = get_softmax_probs(embeddings, self.magnet_data, 
                 return_scores=True)
         return scores
@@ -129,16 +124,15 @@ def acc(model, dataset):
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=256, shuffle=False)
     correct = 0
     for img, label in dataloader:
-        out = model(img.to('cuda'))
+        out = model(img.to(device))
         print(out.argmax(1).cpu(), label)
         correct += (out.argmax(1).cpu() == label).sum()
         print('correct', correct)
-    print('accuracy is {}'.format(float(correct)/len(dataset)))
+    print('accuracy is {}'.format(float(correct)*100/len(dataset)))
     return correct/len(dataset)
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 if __name__ == "__main__":
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
     # load the base classifier
     # checkpoint = torch.load(args.base_classifier)
     # base_classifier = get_architecture(checkpoint["arch"], args.dataset)
