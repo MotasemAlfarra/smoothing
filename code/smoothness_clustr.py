@@ -133,7 +133,7 @@ def acc(model, dataset):
         print(out.argmax(1).cpu(), label)
         correct += (out.argmax(1).cpu() == label).sum()
         print('correct', correct)
-    print('accuracy is {}'.format(correct/len(dataset)))
+    print('accuracy is {}'.format(float(correct)/len(dataset)))
     return correct/len(dataset)
 
 if __name__ == "__main__":
