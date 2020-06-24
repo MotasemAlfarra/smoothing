@@ -125,6 +125,14 @@ def get_softmax_probs(embeddings, magnet_data, return_scores=False):
     to_return = scores if return_scores else F.normalize(scores, p=1, dim=1)
     return to_return
 
+def acc(model, dataset):
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=256, shuffle=False)
+    correct = 0
+    for img, label in dataloader:
+        out = model(img)
+        correct += (out.argmax(1) = label).sum()
+    print('accuracy is {}'.format(correct/len(dataset)))
+    return correct/len(dataset)
 
 if __name__ == "__main__":
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -147,6 +155,7 @@ if __name__ == "__main__":
 
     # iterate through the dataset
     dataset = get_dataset(args.dataset, args.split)
+    _ = accuracy(model, dataset)
     for i in tqdm(range(len(dataset))):
 
         # only certify every args.skip examples, and stop after args.max examples
