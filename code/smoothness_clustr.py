@@ -125,9 +125,7 @@ def acc(model, dataset):
     correct = 0
     for img, label in dataloader:
         out = model(img.to(device))
-        print(out.argmax(1).cpu(), label)
         correct += (out.argmax(1).cpu() == label).sum()
-        print('correct', correct)
     print('accuracy is {}'.format(float(correct)*100/len(dataset)))
     return correct/len(dataset)
 
