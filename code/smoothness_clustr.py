@@ -73,8 +73,8 @@ class MagnetModelWrapper(nn.Module):
         super(MagnetModelWrapper, self).__init__()
         self.model = model
         self.magnet_data = magnet_data
-        self.mean = torch.tensor([0.4914, 0.4822, 0.4465]).view(1,3,1,1)
-        self.std = torch.tensor( [0.2023, 0.1994, 0.2010]).view(1,3,1,1)
+        self.mean = torch.tensor([0.4914, 0.4822, 0.4465]).view(1,3,1,1).to(device)
+        self.std = torch.tensor( [0.2023, 0.1994, 0.2010]).view(1,3,1,1).to(device)
 
     def forward(self, x):
         _, embeddings = self.model((x-self.mean)/self.std)
