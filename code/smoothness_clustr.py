@@ -129,7 +129,7 @@ def acc(model, dataset):
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=256, shuffle=False)
     correct = 0
     for img, label in dataloader:
-        out, _ = model(img.to('cuda'))
+        out = model(img.to('cuda'))
         print(out.argmax(1).cpu(), label)
         correct += (out.argmax(1).cpu() == label).sum()
         print('correct', correct)
