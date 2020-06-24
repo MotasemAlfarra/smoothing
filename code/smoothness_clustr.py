@@ -77,9 +77,9 @@ class MagnetModelWrapper(nn.Module):
         self.std = torch.tensor( [0.2023, 0.1994, 0.2010]).view(1,3,1,1)
 
     def forward(self, x):
-            _, embeddings = self.model((x-self.mean)/self.std)
-            scores = get_softmax_probs(embeddings, self.magnet_data, 
-                return_scores=True)
+        _, embeddings = self.model((x-self.mean)/self.std)
+        scores = get_softmax_probs(embeddings, self.magnet_data, 
+            return_scores=True)
         return scores
 
 
