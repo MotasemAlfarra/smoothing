@@ -121,11 +121,11 @@ def get_softmax_probs(embeddings, magnet_data, return_scores=False):
     return to_return
 
 def acc(model, dataset):
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=256, shuffle=False)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
     correct = 0
     for img, label in dataloader:
-        out = model.predict(img.to(device), 10, 0.001, img.shape[0])
-        correct += (out.argmax(1).cpu() == label).sum()
+        out = model.predict(img.to(device), 10, 0.01, img.shape[0])
+        correct += (out == label).sum()
     print('accuracy is {}'.format(float(correct)*100/len(dataset)))
     return correct/len(dataset)
 
