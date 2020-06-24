@@ -157,7 +157,7 @@ if __name__ == "__main__":
 
     # iterate through the dataset
     dataset = get_dataset(args.dataset, args.split)
-    _ = acc(model, dataset)
+    _ = acc(base_classifier, dataset)
     for i in tqdm(range(len(dataset))):
 
         # only certify every args.skip examples, and stop after args.max examples
