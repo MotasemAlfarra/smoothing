@@ -124,7 +124,7 @@ def acc(model, dataset):
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=256, shuffle=False)
     correct = 0
     for img, label in dataloader:
-        out = model(img.to(device))
+        out = model.predict(img.to(device), 10, 0.001, img.shape[0])
         correct += (out.argmax(1).cpu() == label).sum()
     print('accuracy is {}'.format(float(correct)*100/len(dataset)))
     return correct/len(dataset)
@@ -149,7 +149,7 @@ if __name__ == "__main__":
 
     # iterate through the dataset
     dataset = get_dataset(args.dataset, args.split)
-    _ = acc(base_classifier, dataset)
+    _ = acc(smoothed_classifier, dataset)
     for i in tqdm(range(len(dataset))):
 
         # only certify every args.skip examples, and stop after args.max examples
