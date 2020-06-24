@@ -63,7 +63,6 @@ class Smooth(object):
         :param batch_size: batch size to use when evaluating the base classifier
         :return: the predicted class, or ABSTAIN
         """
-        self.sigma = 0.0 #We do not want to smooth our classifier
         self.base_classifier.eval()
         counts = self._sample_noise(x, n, batch_size)
         top2 = counts.argsort()[::-1][:2]
